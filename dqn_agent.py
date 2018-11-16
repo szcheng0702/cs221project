@@ -102,7 +102,7 @@ if __name__ == '__main__':
         state = env.reset()
         state = np.reshape(state, [1, state_size])
         for time in range(TIME_LIMIT):
-            env.render()
+            # env.render()
             action = agent.act(state) # DQN agent chooses next action 
             next_state, reward, done, _ = env.step(action) # observe rewards and successor state
             # reward = reward if not done else -10
