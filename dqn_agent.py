@@ -96,23 +96,28 @@ if __name__ == '__main__':
     agent = DQNAgent(state_size, action_size)
     done = False
     batch_size = 500
+    scores = [] # store the score for each completed episode
 
     for episode in range(EPISODES):
         print('episode = {}'.format(episode))
         state = env.reset()
         state = np.reshape(state, [1, state_size])
+        score = 0
+
         for time in range(TIME_LIMIT):
             # env.render()
             action = agent.act(state) # DQN agent chooses next action 
             next_state, reward, done, _ = env.step(action) # observe rewards and successor state
-            # reward = reward if not done else -10
+            score += reward # keep track of game score
             next_state = np.reshape(next_state, [1, state_size])
             agent.remember(state, action, reward, next_state, done) # add s,a,r,s' to dataset (agent.memory)
             state = next_state
 
             if done:
                 print('episode: {}/{}, score: {}, exploration rate: {:.2}'
-                      .format(episode, EPISODES, time, agent.epsilon))
+                      .format(episode, EPISODES, score, agent.epsilon))
+                scores.append(score)
+                print('scores = {}'.format(scores))
                 break
 
         # Train NN after each episode or timeout by randomly sampling a batch from the dataset in agent.memory
@@ -121,3 +126,8 @@ if __name__ == '__main__':
     
     # Save weights after training is complete
     agent.save('./save/phoenix_dqn_3L.h5')
+
+    # Calculate average score
+    print('AVERAGE SCORE = {}'.format(np.mean(np.asarray(rewards))))
+
+
