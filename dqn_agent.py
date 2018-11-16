@@ -3,6 +3,7 @@
 
 import random
 import gym
+import os
 import numpy as np
 from collections import deque
 from keras.models import Sequential
@@ -19,7 +20,7 @@ class DQNAgent:
         self.memory = deque(maxlen=5000) # maximum number of samples stored in dataset
         self.gamma = 0.95 # discount rate
         self.epsilon = 1.0 # exploration rate
-        self.epsilon_min = 0.01 # minimum exploration rate
+        self.epsilon_min = 0.1 # minimum exploration rate
         self.epsilon_decay = 0.995 # decay rate for exploration
         self.learning_rate = 0.001
         self.model = self._build_model_3L()
@@ -95,11 +96,11 @@ if __name__ == '__main__':
     action_size = env.action_space.n
     agent = DQNAgent(state_size, action_size)
     done = False
-    batch_size = 500
+    batch_size = 300
     scores = [] # store the score for each completed episode
 
     for episode in range(EPISODES):
-        print('episode = {}'.format(episode))
+        # print('episode = {}'.format(episode))
         state = env.reset()
         state = np.reshape(state, [1, state_size])
         score = 0
@@ -117,17 +118,17 @@ if __name__ == '__main__':
                 print('episode: {}/{}, score: {}, exploration rate: {:.2}'
                       .format(episode, EPISODES, score, agent.epsilon))
                 scores.append(score)
-                print('scores = {}'.format(scores))
                 break
 
+        scores.append(score) 
+        print ('episode = {}, score = {}'.format(episode, score))
         # Train NN after each episode or timeout by randomly sampling a batch from the dataset in agent.memory
         if len(agent.memory) > batch_size:
             agent.replay(batch_size)
-    
+
+    # Print average score if scores is not empty
+    if scores:
+        print('AVERAGE SCORE = {}'.format(np.mean(np.asarray(scores))))
+
     # Save weights after training is complete
-    agent.save('./save/phoenix_dqn_3L.h5')
-
-    # Calculate average score
-    print('AVERAGE SCORE = {}'.format(np.mean(np.asarray(rewards))))
-
-
+    agent.save(os.path.join(os.getcwd(), 'phoenix_dqn_3L.h5'))
