@@ -14,3 +14,6 @@ https://towardsdatascience.com/atari-reinforcement-learning-in-depth-part-1-ddqn
 
 Implementation for DOOM:
 https://medium.freecodecamp.org/an-introduction-to-deep-q-learning-lets-play-doom-54d02d8017d8
+
+A DQN open source code:
+https://github.com/keon/deep-q-learning
