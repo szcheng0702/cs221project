@@ -43,8 +43,9 @@ for episode in range(num_episodes):
 	action = env.action_space.sample()
 	total_reward=0
 	for t in range(max_number_of_steps):
-		env.render()
+		#env.render()
 		observation, reward, done, info = env.step(action)
+		print (reward)
 		total_reward+=reward  
 		_,action= get_action(low,high,observation)  
 		if done or t==max_number_of_steps-1:

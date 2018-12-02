@@ -20,9 +20,9 @@ class DQNAgent:
         self.memory = deque(maxlen=5000) # maximum number of samples stored in dataset
         self.gamma = 0.95 # discount rate
         self.epsilon = 1.0 # exploration rate
-        self.epsilon_min = 0.1 # minimum exploration rate
-        self.epsilon_decay = 0.995 # decay rate for exploration
-        self.learning_rate = 0.001
+        self.epsilon_min = 0.2 # minimum exploration rate
+        self.epsilon_decay = 1 # decay rate for exploration
+        self.learning_rate = 0.01
         self.model = self._build_model_3L()
 
     def _build_model_2L(self):
