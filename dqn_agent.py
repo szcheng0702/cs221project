@@ -17,13 +17,13 @@ class DQNAgent:
     def __init__(self, state_size, action_size):
         self.state_size = state_size
         self.action_size = action_size
-        self.memory = deque(maxlen=5000) # maximum number of samples stored in dataset
+        self.memory = deque(maxlen=2000) # maximum number of samples stored in dataset
         self.gamma = 0.95 # discount rate
         self.epsilon = 1.0 # exploration rate
         self.epsilon_min = 0.1 # minimum exploration rate
-        self.epsilon_decay = 0.995 # decay rate for exploration
+        self.epsilon_decay = 0.9995 # decay rate for exploration
         self.learning_rate = 0.001
-        self.model = self._build_model_3L()
+        self.model = self._build_model_4L()
 
     def _build_model_2L(self):
         """2-layer Neural Net for Deep-Q learning Model."""
@@ -45,9 +45,9 @@ class DQNAgent:
     def _build_model_4L(self):
         """4-layer Neural Net for Deep-Q learning Model."""
         model = Sequential()
-        model.add(Dense(units=24, input_dim=self.state_size, activation='relu')) # input layer
-        model.add(Dense(units=24, activation='relu'))
-        model.add(Dense(units=24, activation='relu'))
+        model.add(Dense(units=256, input_dim=self.state_size, activation='relu')) # input layer
+        model.add(Dense(units=256, activation='relu'))
+        model.add(Dense(units=256, activation='relu'))
         model.add(Dense(units=self.action_size, activation='linear')) # output layer
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate)) # loss function = mean squared error
         return model
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     action_size = env.action_space.n
     agent = DQNAgent(state_size, action_size)
     done = False
-    batch_size = 300
+    batch_size = 32
     scores = [] # store the score for each completed episode
 
     for episode in range(EPISODES):
@@ -115,20 +115,21 @@ if __name__ == '__main__':
             state = next_state
 
             if done:
-                print('episode: {}/{}, score: {}, exploration rate: {:.2}'
+                print('episode completed: {}/{}, score: {}, exploration rate: {:.2}'
                       .format(episode, EPISODES, score, agent.epsilon))
                 scores.append(score)
                 break
 
+            if len(agent.memory) > batch_size:
+                # print('TRAINING')
+                agent.replay(batch_size)
+
         scores.append(score) 
         print ('episode = {}, score = {}'.format(episode, score))
-        # Train NN after each episode or timeout by randomly sampling a batch from the dataset in agent.memory
-        if len(agent.memory) > batch_size:
-            agent.replay(batch_size)
 
     # Print average score if scores is not empty
     if scores:
         print('AVERAGE SCORE = {}'.format(np.mean(np.asarray(scores))))
 
     # Save weights after training is complete
-    agent.save(os.path.join(os.getcwd(), 'phoenix_dqn_3L.h5'))
+    agent.save(os.path.join(os.getcwd(), 'phoenix_dqn_4L.h5'))
