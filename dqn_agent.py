@@ -21,9 +21,9 @@ class DQNAgent:
         self.gamma = 0.95 # discount rate
         self.epsilon = 1.0 # exploration rate
         self.epsilon_min = 0.1 # minimum exploration rate
-        self.epsilon_decay = 0.9995 # decay rate for exploration
+        self.epsilon_decay = (self.epsilon_min/self.epsilon)**(1.0/(TIME_LIMIT**EPISODES)) # decay rate for exploration
         self.learning_rate = 0.001
-        self.model = self._build_model_4L()
+        self.model = self._build_model_3L()
 
     def _build_model_2L(self):
         """2-layer Neural Net for Deep-Q learning Model."""
@@ -36,8 +36,8 @@ class DQNAgent:
     def _build_model_3L(self):
         """3-layer Neural Net for Deep-Q learning Model."""
         model = Sequential()
-        model.add(Dense(units=24, input_dim=self.state_size, activation='relu')) # input layer
-        model.add(Dense(units=24, activation='relu'))
+        model.add(Dense(units=256, input_dim=self.state_size, activation='relu')) # input layer
+        model.add(Dense(units=256, activation='relu'))
         model.add(Dense(units=self.action_size, activation='linear')) # output layer
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate)) # loss function = mean squared error
         return model
@@ -95,8 +95,9 @@ if __name__ == '__main__':
     state_size = env.observation_space.shape[0]
     action_size = env.action_space.n
     agent = DQNAgent(state_size, action_size)
+    print('epsilon_decay = {}'.format(epsilon_decay))
     done = False
-    batch_size = 32
+    batch_size = 8
     scores = [] # store the score for each completed episode
 
     for episode in range(EPISODES):
@@ -127,9 +128,12 @@ if __name__ == '__main__':
         scores.append(score) 
         print ('episode = {}, score = {}'.format(episode, score))
 
+        if episode % 50 == 0:
+            print('AVERAGE SCORE = {}'.format(np.mean(np.asarray(scores))))
+
     # Print average score if scores is not empty
     if scores:
-        print('AVERAGE SCORE = {}'.format(np.mean(np.asarray(scores))))
+        print('FINAL AVERAGE SCORE = {}'.format(np.mean(np.asarray(scores))))
 
     # Save weights after training is complete
     agent.save(os.path.join(os.getcwd(), 'phoenix_dqn_4L.h5'))
