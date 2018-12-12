@@ -53,8 +53,8 @@ class Runner:
         self.max_depth = max_depth
         self.playouts = playouts
 
-    def print_stats(self, loop, score, avg_time):
-        sys.stdout.write('\r%3d   score:%10.3f   avg_time:%4.1f s' % (loop, score, avg_time))
+    def print_stats(self, loop, score, maxscore,avg_time):
+        sys.stdout.write('\r%3d   score:%10.3f   maxscore:%10.3f avg_time:%4.1f s' % (loop, score, maxscore,avg_time))
         sys.stdout.flush()
 
     def run(self):
@@ -128,6 +128,7 @@ class Runner:
                 #state.__del__()
 
             sum_reward = 0
+            
             for action in best_actions:
                 _, reward, terminal, _ = env.step(action)
                 sum_reward += reward
@@ -136,10 +137,12 @@ class Runner:
 
             best_rewards.append(sum_reward)
             score = max(moving_average(best_rewards, 100))
+            maxscore=max(best_rewards)
             avg_time = (time()-start_time)/(loop+1)
-            self.print_stats(loop+1, score, avg_time)
+            self.print_stats(loop+1, score, maxscore,avg_time)
 
         env.close()
+        print (sum(best_rewards)/float(len(best_rewards)))
         with open('testfile.bin', 'wb') as f:
             pickle.dump(best_rewards, f)
 
@@ -158,7 +161,7 @@ def main():
     # Toy text
     #Runner(rec_dir, 'Taxi-v2',   loops=100, playouts=4000, max_depth=50).run()
     #Runner(rec_dir, 'NChain-v0', loops=100, playouts=3000, max_depth=50).run()
-    Runner(rec_dir, 'Phoenix-ram-v0', loops=1000, playouts=100, max_depth=1000).run()
+    Runner(rec_dir, 'Phoenix-ram-v0', loops=20, playouts=500, max_depth=5000).run()
 
     # Algorithmic
     # Runner(rec_dir, 'Copy-v0').run()
